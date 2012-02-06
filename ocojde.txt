@@ -1,0 +1,11 @@
+Pokus o realizaci karetní hry 
+Pro začátek se pokusím o Prší, snad to Ondra Hodek přežije
+
+Koncept
+Hra bude naprogramována pochopitelně v Pythonu důsledně objektovým způsobem. Pokusím se o přehledný a logický návrh jednotlivých objektů, aby bylo možno snadno přejít ke klient - server konfiguraci. Veškeré přístupy k vlastnostem objektů budou realizovány důsledně přes jejich rozhraní, tedy pomocí funkcí. 
+
+Objekty 
+Hra
+Hrac
+Balik
+Hromada
