@@ -164,18 +164,47 @@ class Hra:
             ireturn = False
         return ireturn
 
-global b, hra, h1, h2
+def hrac_ma_rozdano():
+    b = Balik(32)
+    b.zamichej()
+    hra = Hra("prsi")
+    h1 = Hrac("jarda")
+    h2 = Hrac("carda")
+    h1.do_hry(hra)
+    h2.do_hry(hra)
+    hra.balik(b)
+    hra.stav_hry = "zacatek_hry"
+    hra.rozdej_karty()
 
-b = Balik(32)
-b.zamichej()
-hra = Hra("prsi")
-h1 = Hrac("jarda")
-h2 = Hrac("carda")
-h1.do_hry(hra)
-h2.do_hry(hra)
-hra.balik(b)
-hra.rozdej_karty()
-hra.stav_hry = "zacatek_hry"
-hra.rozdej_karty()
+    for h in hra.hraci:
+        if len(h.karty) != 4:
+            return False
 
-    
+    return True
+
+def balik_ma_spravny_pocet_karet():
+    b = Balik(32)
+    if not b._pocet == 32:
+        return False
+    if not b.info == "mariasky":
+        return False
+    return True
+
+if __name__ == '__main__':
+    print hrac_ma_rozdano()
+    print balik_ma_spravny_pocet_karet()
+
+    global b, hra, h1, h2
+
+    b = Balik(32)
+    b.zamichej()
+    hra = Hra("prsi")
+    h1 = Hrac("jarda")
+    h2 = Hrac("carda")
+    h1.do_hry(hra)
+    h2.do_hry(hra)
+    hra.balik(b)
+    hra.rozdej_karty()
+    hra.stav_hry = "zacatek_hry"
+    hra.rozdej_karty()
+
