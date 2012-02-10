@@ -83,6 +83,8 @@ class Hra:
         self._poradi_hracu = []
         self._pocet_karet = 4
         self._rozdavat_po = 2
+        self._stouchy = []      # průběh hry (hráč, vynesené karty,
+                                # líznuté karty, renoncy)
 
     def do_hry(self, hrac):
         """Přidá hráče do hry - vrátí jeho index"""
@@ -145,12 +147,18 @@ class Hra:
                         self.hraci[ihr].karty.append(self.balik().karty.pop())
                 ipock -= self._rozdavat_po
             # vyneseni prvni karty
+            stouch = {"hrac": (self.forhont()-1) % self.pocet_hracu, \
+                      "vynesene":[], "liznute": [], "renonc": []}
             self._odehrane.append(self.balik().karty.pop())
+            stouch["vynesene"].append(self._odehrane[len(self._odehrane)-1])
             self._aktbarva = self._odehrane[len(self._odehrane)-1][0]
             self._akthodnota = self._odehrane[len(self._odehrane)-1][1]
             # ošetření vyneseného svrška 
             if self._akthodnota == 12:
                 self._aktbarva = self._balik.karty[0][0]
+                self._akthodnota = None
+                stouch["vynesene"].append([self._aktbarva, self._akthodnota])
+            self._stouchy.append(stouch)
             ireturn = True
         else:
             ireturn = False
@@ -168,6 +176,6 @@ h2.do_hry(hra)
 hra.balik(b)
 hra.rozdej_karty()
 hra.stav_hry = "zacatek_hry"
-# hra.rozdej_karty()
+hra.rozdej_karty()
 
     
