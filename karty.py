@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import unittest
 
 class Balik:
     """Balíček karet se kterým se hraje,
@@ -189,6 +190,33 @@ def balik_ma_spravny_pocet_karet():
     if not b.info == "mariasky":
         return False
     return True
+
+class TestPrsi(unittest.TestCase):
+    def setUp(self):
+        self.b = Balik(32)
+        self.b.zamichej()
+        self.hra = Hra("prsi")
+        self.h1 = Hrac("jarda")
+        self.h2 = Hrac("carda")
+        self.h1.do_hry(self.hra)
+        self.h2.do_hry(self.hra)
+        self.hra.balik(self.b)
+        self.hra.stav_hry = "zacatek_hry"
+        self.hra.rozdej_karty()
+
+    def test_hrac_ma_rozdano(self):
+        for h in self.hra.hraci:
+            self.assertEqual(4, len(h.karty))
+
+    def test_balik_ma_spravny_pocet_karet(self):
+        self.assertEqual(32, self.b._pocet)
+        self.assertEqual("mariasky", self.b.info)
+        
+
+
+if __name__ == '__main__':
+    unittest.main()
+
 
 if __name__ == '__main__':
     print hrac_ma_rozdano()
