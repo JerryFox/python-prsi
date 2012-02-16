@@ -130,17 +130,9 @@ class Hra:
                        self.balik().__class__.__name__ == "Balik" and \
                        self.stav_hry == "zacatek_hry":
             ipock = self._pocet_karet
-            # kontrola, aby měli hráči prázdnou pazouru
-            # případné karty vrátit do balíku
-            for hrac in self.hraci:
-                for ik in hrac.karty: 
-                    self._balik.karty.insert(0,ik)
-                hrac.karty = []
-            # sebrat odehrané karty
-            for ik in self._odehrane:
-                self._balik.karty.insert(0, ik)
-            self._odehrane = []
 
+            # vratit karty od hracu a vynesene karty
+            self._seber_karty()
             # rozdávat v pořadí podle self._poradi_hracu
             while ipock > 0:
                 for ihr in self._poradi_hracu:
@@ -165,31 +157,17 @@ class Hra:
             ireturn = False
         return ireturn
 
-def hrac_ma_rozdano():
-    b = Balik(32)
-    b.zamichej()
-    hra = Hra("prsi")
-    h1 = Hrac("jarda")
-    h2 = Hrac("carda")
-    h1.do_hry(hra)
-    h2.do_hry(hra)
-    hra.balik(b)
-    hra.stav_hry = "zacatek_hry"
-    hra.rozdej_karty()
-
-    for h in hra.hraci:
-        if len(h.karty) != 4:
-            return False
-
-    return True
-
-def balik_ma_spravny_pocet_karet():
-    b = Balik(32)
-    if not b._pocet == 32:
-        return False
-    if not b.info == "mariasky":
-        return False
-    return True
+    def _seber_karty(self):
+            # kontrola, aby měli hráči prázdnou pazouru
+            # případné karty vrátit do balíku
+            for hrac in self.hraci:
+                for ik in hrac.karty: 
+                    self._balik.karty.insert(0,ik)
+                hrac.karty = []
+            # sebrat odehrané karty
+            for ik in self._odehrane:
+                self._balik.karty.insert(0, ik)
+            self._odehrane = []
 
 class TestPrsi(unittest.TestCase):
     def setUp(self):
@@ -211,17 +189,52 @@ class TestPrsi(unittest.TestCase):
     def test_balik_ma_spravny_pocet_karet(self):
         self.assertEqual(32, self.b._pocet)
         self.assertEqual("mariasky", self.b.info)
+
+    def test_michani(self):
+        ibalik = Balik(32)
+        nezamich_karty = ibalik.karty[:]
+        ibalik.zamichej()
+        zamich_karty = ibalik.karty[:]
+        # zamichane a nezamichane karty - ruzne seznamy
+        # (teoreticky by ty seznamy mohly byt stejne)
+        self.assertNotEqual(nezamich_karty, zamich_karty)
+        # setridene nezamichane a zamichane - stejne seznamy
+        nezamich_karty.sort()
+        zamich_karty.sort()
+        self.assertEqual(nezamich_karty, zamich_karty)
+
+    def test_rozdavani_karet(self):
+        rozdane_karty = []  # seznam rozdaných karet jednotlivých hráčů
+        for i in range(len(self.hra.hraci)):
+            rozdane_karty.append([])
+            rozdane_karty[i].append(self.hra.hraci[i].karty)
+        self.hra._seber_karty()
+        ikarty = self.hra.balik().karty[:]
+        ikarty.sort()
+        for i in range(10):
+            self.hra.rozdej_karty()
+            for i in range(len(self.hra.hraci)):
+                # otestovat, že má hráč jiné karty než
+                # v předešlých hrách
+                for k in rozdane_karty[i]:
+                    self.assertNotEqual(self.hra.hraci[i].karty, k)
+                rozdane_karty[i].append(self.hra.hraci[i].karty)
+        self.hra._seber_karty()
+        self.hra.balik().karty.sort()
+        self.assertEqual(ikarty, self.hra.balik().karty)
+
+    def test_poradi_hracu(self):
+        """otestovat, ze ma kazdy hrac jine poradi v rozsahu
+        0 - <pocet hracu - 1>"""
+        global iporadi 
+        iporadi = []
+        for h in self.hra.hraci:
+            iporadi.append(h.poradi())
+        iporadi.sort()
+        self.assertEqual(iporadi, range(len(self.hra.hraci)))
         
-
-
-if __name__ == '__main__':
-    unittest.main()
-
-
-if __name__ == '__main__':
-    print hrac_ma_rozdano()
-    print balik_ma_spravny_pocet_karet()
-
+        
+def pro_ucely_testovani(): 
     global b, hra, h1, h2
 
     b = Balik(32)
@@ -235,4 +248,11 @@ if __name__ == '__main__':
     hra.rozdej_karty()
     hra.stav_hry = "zacatek_hry"
     hra.rozdej_karty()
+
+
+
+if __name__ == '__main__':
+    pro_ucely_testovani()
+    unittest.main()
+
 
