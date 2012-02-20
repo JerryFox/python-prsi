@@ -226,13 +226,12 @@ class TestPrsi(unittest.TestCase):
     def test_poradi_hracu(self):
         """otestovat, ze ma kazdy hrac jine poradi v rozsahu
         0 - <pocet hracu - 1>"""
-        global iporadi 
         iporadi = []
         for h in self.hra.hraci:
             iporadi.append(h.poradi())
         iporadi.sort()
-        self.assertEqual(iporadi, range(len(self.hra.hraci)))
-        
+        self.assertEqual(iporadi, list(range(len(self.hra.hraci))))
+
         
 def pro_ucely_testovani(): 
     global b, hra, h1, h2
