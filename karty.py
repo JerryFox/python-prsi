@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import inspect
 
 class Balik:
     """Balíček karet se kterým se hraje,
@@ -45,35 +46,49 @@ class Hrac:
         self.karty = []
         self._hra = None        # aktuální hra 
         self._poradi = None     # pořadí hráče: 0 = forhont
+        self._typ = "auto"      # typ hráče: "auto", "manual"
 
     def jmeno(self, jmeno=None):
-        """Zjištění - nastavení jména hry"""
+        """Zjištění - nastavení jména hráče"""
         if jmeno is not None:
             self._jmeno = jmeno
         return self._jmeno
 
-    def do_hry(self, hra):
+    def hra(self, hra=None):
         """zaregistrování hráče do hry"""
         # kontrola, jestli se pokouší vlézt do validní hry
         if hra.__class__.__name__ == "Hra" and \
                        self._hra is None:
-            i = hra.do_hry(self)
+            i = hra.hra(self)
             if i.__class__.__name__ == "int":
                 self._hra = hra
                 self._poradi = i
+        return self._hra
 
     def poradi(self, poradi=None):
         # zjištění - nastavení pořadí hráče - měla by to dělat jenom inst. Hra
         if poradi.__class__.__name__ == "int":
             self._poradi = poradi
         return self._poradi
+
+    def hraj(self):
+        # kontrola, jestli je hrac opravnen hrat
+        ireturn = False
+        if self.hra().token() == self:
+            ireturn = True
+            # hrac odehraje a vrati token sve hre
+            self.hra().token(self.hra())
+        return ireturn
+
+    def odevzdat_token(self):
+        self.hra().prevzit_token()
     
 class Hra:
-    """Hra a informace o ní"""
+    """Hra, informace o hre"""
     def __init__(self, nazev, typ="prsi"):
         self.pocet_hracu = 0
         self.hraci = []
-        self.nazev_hry = nazev
+        self._jmeno = nazev
         self.stav_hry = "prihlasovani_hracu"
         self.typ_hry = typ
         self._balik = None
@@ -85,8 +100,10 @@ class Hra:
         self._rozdavat_po = 2
         self._stouchy = []      # průběh hry (hráč, vynesené karty,
                                 # líznuté karty, renoncy)
+        self._token = self      # kdo je aktivni v dane hre
+        self._last_player = None # naposledy hrajici hrac 
 
-    def do_hry(self, hrac):
+    def hra(self, hrac):
         """Přidá hráče do hry - vrátí jeho index"""
         # kontrola, jestli je objekt instancí třídy Hrac
         if hrac.__class__.__name__ == "Hrac":
@@ -151,6 +168,7 @@ class Hra:
                 self._akthodnota = None
                 stouch["vynesene"].append([self._aktbarva, self._akthodnota])
             self._stouchy.append(stouch)
+            self.token(self.hraci[self.forhont()])
             ireturn = True
         else:
             ireturn = False
@@ -168,6 +186,31 @@ class Hra:
                 self._balik.karty.insert(0, ik)
             self._odehrane = []
 
+    def token(self, objekt=None):
+        if objekt is not None:
+            self._token = objekt
+        return self._token
+
+    def jmeno(self, jmeno=None):
+        """Zjištění - nastavení jména hry"""
+        if jmeno is not None:
+            self._jmeno = jmeno
+        return self._jmeno
+
+    def hraj(self):
+        # kontrola, jestli ma hra token
+        ireturn = False
+        if self.hra().token() == self:
+            ireturn = True
+            # hra udela cinnosti, ktere ma
+            # a preda token hraci, ktery je na rade 
+            self.hra().token(self.hra())
+        return ireturn
+
+    def prevzit_token(self):
+        print inspect.stack()[1]
+    
+
         
 def pro_ucely_testovani(): 
     global b, hra, h1, h2
@@ -177,8 +220,8 @@ def pro_ucely_testovani():
     hra = Hra("prsi")
     h1 = Hrac("jarda")
     h2 = Hrac("carda")
-    h1.do_hry(hra)
-    h2.do_hry(hra)
+    h1.hra(hra)
+    h2.hra(hra)
     hra.balik(b)
     hra.rozdej_karty()
     hra.stav_hry = "zacatek_hry"

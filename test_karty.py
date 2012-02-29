@@ -12,8 +12,8 @@ class TestPrsi(unittest.TestCase):
         self.hra = Hra("prsi")
         self.h1 = Hrac("jarda")
         self.h2 = Hrac("carda")
-        self.h1.do_hry(self.hra)
-        self.h2.do_hry(self.hra)
+        self.h1.hra(self.hra)
+        self.h2.hra(self.hra)
         self.hra.balik(self.b)
         self.hra.stav_hry = "zacatek_hry"
         self.hra.rozdej_karty()
