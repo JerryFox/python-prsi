@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pokusny komentar
 
 import random
 import inspect
